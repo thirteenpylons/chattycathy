@@ -1,0 +1,27 @@
+{
+  "name": "harvey",
+  "version": "1.0.0",
+  "description": "Chat service for projects and code management",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thirteenpylons/harvey.git"
+  },
+  "author": "Christian M. Fulton",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/thirteenpylons/harvey/issues"
+  },
+  "homepage": "https://github.com/thirteenpylons/harvey#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "moment": "^2.29.1",
+    "socket.io": "^4.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
