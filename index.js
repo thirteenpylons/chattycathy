@@ -9,10 +9,67 @@ const {
     newUser,
     getIndividualRoomUsers
 } = require('./helpers/userHelper');
+const { isTypedArray } = require('util/types');
 
 const app = express();
-const PORT = 3000 || process.env.PORT
+const server = http.createServer(app);
+const io = socketio(server)
 
+// set public folder
+app.user(express.static(path.join(__dirname, 'public')));
+
+// this block will run when the client connects
+io.on('connection', socket => {
+    socket.on('joinRoom', ({ username, room }) => {
+        const user = newUser(socket.id, username, room);
+
+        socket.join(user.room);
+
+        // General welcome
+        socket.emit('message', formatMessage("Cathy", 'Messages are limited to this room! '));
+
+        // Broadcast everytime users connect
+        socket.broadcast
+            .to(user.room)
+            .emit(
+                'message',
+                formatMessage("Cathy", `${user.username} has joined the room`)
+            );
+
+        // Current active users and room name
+        io.to(user.room).emit('roomUsers', {
+            room: user.room,
+            users: getIndividualRoomUsers(user.room)
+        });
+    });
+
+    // Listen for client message
+    socket.on('chatMessage', msg => {
+        const user = getActiveUser(socket.id);
+
+        io.to(user.room).emit('message', formatMessage(user.username, msg));
+    });
+
+    // Runs when client disconnects
+    socket.on('disconnect', () => {
+        const user = exitRoom(socket.id);
+
+        if (user) {
+            io.to(user.room).emit(
+                'message',
+                formatMessage("Cathy", `${user.username} has left the room`)
+            );
+
+            // Current active users and room name
+            io.to(user.room).emit('roomUsers', {
+                room: user.room,
+                users: getIndividualRoomUsers(user.room)
+            });
+        }
+    });
+});
+
+const PORT = process.env.POST || 3000;
 
 app.listen(PORT, () => console.log(`App is live on port ${PORT}`))
-app.use(express.static(path.join(__dirname, 'public')))
+//app.use(express.static(path.join(__dirname, 'public')))
