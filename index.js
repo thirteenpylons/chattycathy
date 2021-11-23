@@ -9,14 +9,13 @@ const {
     newUser,
     getIndividualRoomUsers
 } = require('./helpers/userHelper');
-const { isTypedArray } = require('util/types');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server)
 
 // set public folder
-app.user(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // this block will run when the client connects
 io.on('connection', socket => {
@@ -71,5 +70,5 @@ io.on('connection', socket => {
 
 const PORT = process.env.POST || 3000;
 
-app.listen(PORT, () => console.log(`App is live on port ${PORT}`))
+server.listen(PORT, () => console.log(`App is live on port ${PORT}`))
 //app.use(express.static(path.join(__dirname, 'public')))
